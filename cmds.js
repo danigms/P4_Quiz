@@ -64,21 +64,38 @@ exports.testCmd = (rl, id) => {  //QUEDA MEJORARLO PARA QUE ADMITA MAYÚSCULAS, 
 	rl.prompt();
 };
 
-exports.playCmd = rl => {
-	/*let score = 0
-	let toBeResolved = [];
+exports.playCmd = rl => {	//Va preguntando los quizzes hasta que se falle en uno
+	let score = 0; //Almacena el número de preguntas que se han ido acertando
+	let toBeResolved = []; //id's de las preguntas que me quedan por contestar
 
-	for ()
+	for (id = 0; id < model.count() ; id++){
+		toBeResolved[id] = id;	//meto los id's de todas las preguntas
+	}
 
-	if (toBeResolved.length === 0){
-
-	} else {
-		let id = Math.random(); quitarla del array
-		let quiz = model.getByIndex(id);
-		rl.question(quiz.question, respuesta => {
-			respuesta === quiz.answer
-		})
-	}*/
+	const playOne = () => {
+		if (toBeResolved.length === 0){
+			biglog('ENHORABUENA', 'green');
+			rl.prompt();
+		} else {
+			let id_preguntar = Math.floor(Math.random() * toBeResolved.length);
+			let quiz = model.getByIndex(toBeResolved[id_preguntar]); 
+			rl.question(colorize(`¿${quiz.question}? `, 'red'), respuesta => {
+				if (respuesta === quiz.answer){
+					score ++;
+					biglog('Correcta', 'green');
+					log(`Lleva acertadas ${score} preguntas`);
+					toBeResolved.splice(id_preguntar,1);
+					playOne();
+				} else {
+					biglog('Incorrecta', 'red');
+					log(`Puntuación final: ${score} aciertos`);
+					rl.prompt();
+				}
+			})
+		}
+	}
+	
+	playOne();
 };
 
 exports.deleteCmd = (rl, id) => {
