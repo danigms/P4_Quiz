@@ -112,7 +112,7 @@ exports.testCmd = (rl, id) => {  //QUEDA MEJORARLO PARA QUE ADMITA MAYÚSCULAS, 
             if (!quiz) {
                 throw new Error(`No existe ningún quiz asociado al id ${id}.`);
             } else {
-                makeQuestion(rl,` ${quiz.question} `)
+                makeQuestion(rl, ` ${quiz.question} `)
                     .then(a => {
                         if (a === quiz.answer) {
                             biglog('Correcta', 'green');
@@ -123,47 +123,64 @@ exports.testCmd = (rl, id) => {  //QUEDA MEJORARLO PARA QUE ADMITA MAYÚSCULAS, 
                     })
             }
         })
-        // .catch(error => {
-        //     errorlog(error.message);
-        // })
-        // .then(() => {
-        //     rl.prompt();
-        // })
+    // .catch(error => {
+    //     errorlog(error.message);
+    // })
+    // .then(() => {
+    //     rl.prompt();
+    // })
 
 };
 
 exports.playCmd = rl => {	//Va preguntando los quizzes hasta que se falle en uno
     let score = 0; //Almacena el número de preguntas que se han ido acertando
     let toBeResolved = []; //id's de las preguntas que me quedan por contestar
+    let ids_restantes= models.quiz.count;
 
-    for (id = 0; id < model.count(); id++) {
-        toBeResolved[id] = id;	//meto los id's de todas las preguntas
-    }
+    models.quiz.findAll()
+        .then(quizzes => {
+            toBeResolved = quizzes;
+            // quizzes.forEach((quiz) => { //investigar por qué no sale con .each
+            //     toBeResolved[quiz.id - 1] = quiz.id; //ESTO ERA EL PROBLEMA!!!!!!!!!!!!!!!!!!
+            // });
+        })
+        .then(() => {
+            return playOne();
+        })
+        .catch(error => {
+            errorlog(error.message);
+        })
+        .then(() => {
+            rl.prompt();
+        })
 
     const playOne = () => {
-        if (toBeResolved.length === 0) {
-            biglog('ENHORABUENA', 'green');
-            rl.prompt();
-        } else {
-            let id_preguntar = Math.floor(Math.random() * toBeResolved.length);
-            let quiz = model.getByIndex(toBeResolved[id_preguntar]);
-            rl.question(colorize(`¿${quiz.question}? `, 'red'), respuesta => {
-                if (respuesta === quiz.answer) {
-                    score++;
-                    biglog('Correcta', 'green');
-                    log(`Lleva acertadas ${score} preguntas`);
-                    toBeResolved.splice(id_preguntar, 1);
-                    playOne();
-                } else {
-                    biglog('Incorrecta', 'red');
-                    log(`Puntuación final: ${score} aciertos`);
-                    rl.prompt();
-                }
-            })
-        }
-    }
+        return new Promise((resolve, reject) => {
+            if (toBeResolved.length === 0) {
+                biglog('ENHORABUENA', 'green');
+                resolve();
+            } else {
+                let id_preguntar = Math.floor(Math.random() * toBeResolved.length);
+                quiz = toBeResolved[id_preguntar];
+                // let quiz = models.quiz.findById(id_preguntar); //ESTO ERA EL PROBLEMA!!!!!!!!!!!!!!!!!!
 
-    playOne();
+                return makeQuestion(rl, `¿${quiz.question}? `)
+                    .then(respuesta => {
+                        if (respuesta.toLowerCase() === quiz.answer.toLowerCase()) {
+                            score++;
+                            biglog('Correcta', 'green');
+                            log(`Lleva acertadas ${score} preguntas`);
+                            toBeResolved.splice(id_preguntar, 1);
+                            resolve(playOne());
+                        } else {
+                            biglog('Incorrecta', 'red');
+                            log(`Puntuación final: ${score} aciertos`);
+                            resolve();
+                        }
+                    });
+            }
+        });
+    };
 };
 
 exports.deleteCmd = (rl, id) => {
