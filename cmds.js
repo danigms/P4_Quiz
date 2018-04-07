@@ -92,7 +92,7 @@ exports.showCmd = (socket, rl, id) => {
         .then(id => models.quiz.findById(id))
         .then(quiz => {
             if (!quiz) {
-                throw new Error(`No existe ningún quiz asociado al id ${id}.`);
+                throw new Error(socket, `No existe ningún quiz asociado al id ${id}.`);
             } else {
                 log(socket, `[${colorize(quiz.id, 'magenta')}]: ${quiz.question} ${colorize('=>', 'magenta')} ${quiz.answer}`);
             }
@@ -110,7 +110,7 @@ exports.testCmd = (socket, rl, id) => {  //QUEDA MEJORARLO PARA QUE ADMITA MAYÚ
         .then(id => models.quiz.findById(id))
         .then(quiz => {
             if (!quiz) {
-                throw new Error(`No existe ningún quiz asociado al id ${id}.`);
+                throw new Error(socket, `No existe ningún quiz asociado al id ${id}.`);
             } else {
                 makeQuestion(rl, ` ${quiz.question} `)
                     .then(a => {
@@ -199,7 +199,7 @@ exports.editCmd = (socket, rl, id) => {
         .then(id => models.quiz.findById((id))
             .then(quiz => {
                 if (!quiz) {
-                    throw new Error(`No existe un quiz asociado al id ${id}.`);
+                    throw new Error(socket, `No existe un quiz asociado al id ${id}.`);
                 }
                 process.stdout.isTTY && setTimeout(() => {
                     rl.write(quiz.question)
