@@ -26,7 +26,7 @@ const makeQuestion = (rl, text) => {
     });
 };
 
-exports.addCmd = rl => {
+exports.addCmd = (socket, rl) => {
     makeQuestion(rl, 'Introduzca una pregunta: ')
         .then(q => {  //texto de la pregunta: q
             return makeQuestion(rl, 'Introduzca la respuesta ')
@@ -154,7 +154,7 @@ exports.playCmd = (socket, rl) => {	//Va preguntando los quizzes hasta que se fa
             rl.prompt();
         })
 
-    const playOne = socket => {
+    const playOne = () => {
         return new Promise((resolve, reject) => {
             if (toBeResolved.length === 0) {
                 biglog(socket, 'ENHORABUENA', 'green');
@@ -238,4 +238,5 @@ exports.creditsCmd = (socket, rl) => {
 
 exports.quitCmd = rl => {
     rl.close();
+    socket.end();
 };
