@@ -4,32 +4,32 @@ const Sequelize = require('sequelize');
 
 //FUNCIONES DE LAS ACCIONES POSIBLES
 exports.helpCmd = (socket, rl) => {
-    log(socket, 'Comandos:');
-    log(socket, 'h|help - Muestra esta ayuda.');
-    log(socket, 'list - Listar los quizzes existentes.');
-    log(socket, 'show <id> - Muestra la pregunta y la respuesta blabla.'); //CAMBIAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    log(socket, 'add - Añadir un nuevo quiz interactivamente.');
-    log(socket, 'delete <id> - Borrar el quiz indicado.');
-    log(socket, 'edit <id> - Editar el quiz indicado.');
-    log(socket, 'test <id> - Probar el quiz indicado.');
-    log(socket, 'p|play -Jugar a preguntar aleatoriamente todos los quizzes.');
-    log(socket, 'credits - Créditos.');
-    log(socket, 'q|quit - Salir del programa.');
+    log(socket, "Comandos:");
+    log(socket, "h|help - Muestra esta ayuda.");
+    log(socket, "list - Listar los quizzes existentes.");
+    log(socket, "show <id> - Muestra la pregunta y la respuesta blabla."); //CAMBIAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    log(socket, "add - Añadir un nuevo quiz interactivamente.");
+    log(socket, "delete <id> - Borrar el quiz indicado.");
+    log(socket, "edit <id> - Editar el quiz indicado.");
+    log(socket, "test <id> - Probar el quiz indicado.");
+    log(socket, "p|play -Jugar a preguntar aleatoriamente todos los quizzes.");
+    log(socket, "credits - Créditos.");
+    log(socket, "q|quit - Salir del programa.");
     rl.prompt();
 };
 
-const makeQuestion = (socket, rl, text) => {
-    return new Promise((socket, resolve, reject) => {
-        rl.question(socket, colorize(text, 'red'), answer => {
+const makeQuestion = (rl, text) => {
+    return new Promise((resolve, reject) => {
+        rl.question(colorize(text, 'red'), answer => {
             resolve(answer.trim());
         });
     });
 };
 
 exports.addCmd = (socket, rl) => {
-    makeQuestion(socket, rl, 'Introduzca una pregunta: ')
+    makeQuestion(rl, 'Introduzca una pregunta: ')
         .then(q => {  //texto de la pregunta: q
-            return makeQuestion(socket, rl, 'Introduzca la respuesta ')
+            return makeQuestion(rl, 'Introduzca la respuesta ')
                 .then(a => { //texto de la respuesta: a, OJO!! Esta promesa va dentro de la anterior, no encadenada al mismo nivel
                     return {question: q, answer: a}; //construyo un quiz (?)
                 });
@@ -72,7 +72,7 @@ exports.listCmd = (socket, rl) => {
 
 };
 
-const validateId = (socket, id) => {
+const validateId = (id) => {
     return new Sequelize.Promise((resolve, reject) => {
         if (typeof id === "undefined") {
             reject(new Error(`Falta el parámetro <id>.`));
