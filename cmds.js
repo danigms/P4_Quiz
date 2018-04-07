@@ -18,18 +18,18 @@ exports.helpCmd = (socket, rl) => {
     rl.prompt();
 };
 
-const makeQuestion = (rl, text) => {
-    return new Promise((resolve, reject) => {
-        rl.question(colorize(text, 'red'), answer => {
+const makeQuestion = (socket, rl, text) => {
+    return new Promise((socket, resolve, reject) => {
+        rl.question(socket, colorize(text, 'red'), answer => {
             resolve(answer.trim());
         });
     });
 };
 
 exports.addCmd = (socket, rl) => {
-    makeQuestion(rl, 'Introduzca una pregunta: ')
+    makeQuestion(socket, rl, 'Introduzca una pregunta: ')
         .then(q => {  //texto de la pregunta: q
-            return makeQuestion(rl, 'Introduzca la respuesta ')
+            return makeQuestion(socket, rl, 'Introduzca la respuesta ')
                 .then(a => { //texto de la respuesta: a, OJO!! Esta promesa va dentro de la anterior, no encadenada al mismo nivel
                     return {question: q, answer: a}; //construyo un quiz (?)
                 });
