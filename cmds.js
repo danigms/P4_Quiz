@@ -123,12 +123,9 @@ exports.testCmd = (socket, rl, id) => {  //QUEDA MEJORARLO PARA QUE ADMITA MAYÚ
                     })
             }
         })
-    // .catch(error => {
-    //     errorlog(error.message);
-    // })
-    // .then(() => {
-    //     rl.prompt();
-    // })
+        .catch(error => {
+            errorlog(socket, error.message);
+        })
 
 };
 
